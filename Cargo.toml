@@ -7,3 +7,6 @@ resolver = "3"
 default-members = ["tui"]
 
 [workspace.dependencies]
+anyhow = "1.0.100"
+directories = "=6.0.0"
+toml = "=0.9.10"
