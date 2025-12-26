@@ -3,9 +3,12 @@ pub mod data;
 pub mod log;
 pub mod ui;
 
+use std::time::Instant;
+
+use ::log::info;
 use anyhow::{Context, Result};
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ::log::info;
+use mc_core::account::base::AccountBase;
 use ratatui::{
     DefaultTerminal, Frame,
     layout::{Constraint, Layout},
@@ -28,15 +31,25 @@ pub fn run(mut terminal: DefaultTerminal) -> Result<()> {
         events(&mut app_data, &app_settings)?;
         terminal.draw(|f| render(f, &mut app_data, &mut app_settings))?;
         if app_data.is_quit {
+            app_settings
+                .save_default()
+                .context("save application settings")?;
             break Ok(());
         }
     }
 }
 
 fn render(frame: &mut Frame, app_data: &mut AppData, app_settings: &mut Settings) {
+
+    let title = if let Some(acc) = &app_settings.account_setting.current_account {
+            format!(" MCTui -{}", acc.get_username())
+        } else {
+            format!(" MCTui -{}",t!("ui.no_account"))
+        };
+
     let outer = Block::default()
         .borders(Borders::ALL)
-        .title(" MCTui -no account-")
+        .title(title)
         .border_style(Style::new().fg(Color::Blue));
 
     let layout = Layout::default()
@@ -55,7 +68,10 @@ fn render(frame: &mut Frame, app_data: &mut AppData, app_settings: &mut Settings
     // 左侧菜单栏
     let menu_items = vec![
         ListItem::new(t!("ui.menu.game")),
-        ListItem::new(t!("ui.menu.download")),
+        ListItem::new(t!("ui.menu.download_install")),
+        ListItem::new(t!("ui.menu.modpack_manage")),
+        ListItem::new(t!("ui.menu.account_manage")),
+        ListItem::new(t!("ui.menu.setting")),
     ];
     let menu_items_len = menu_items.len();
 
@@ -65,12 +81,14 @@ fn render(frame: &mut Frame, app_data: &mut AppData, app_settings: &mut Settings
 
     if let Some(key_event) = &app_data.key_event
         && key_event.is_press()
+        && app_data.menu_list_keys_instant.elapsed().as_millis() > 200
     {
         match key_event.code {
             KeyCode::Up => app_data.menu_list_state.select_previous(),
             KeyCode::Down => app_data.menu_list_state.select_next(),
             _ => {}
         }
+        app_data.menu_list_keys_instant = Instant::now();
     }
     if let Some(mouse_event) = &app_data.mouse_event
         && mouse_event.kind
@@ -95,6 +113,19 @@ fn render(frame: &mut Frame, app_data: &mut AppData, app_settings: &mut Settings
     match selected {
         0 => ui::ui_game::ui_game_render(frame, layout[2], app_data, app_settings),
         1 => ui::ui_download::ui_download_render(frame, layout[2], app_data),
+        2 => ui::ui_modpack_manage::ui_modpack_manage_render(
+            frame,
+            layout[2],
+            app_data,
+            app_settings,
+        ),
+        3 => ui::ui_account_manage::ui_account_manage_render(
+            frame,
+            layout[2],
+            app_data,
+            app_settings,
+        ),
+        4 => ui::ui_setting::ui_setting_render(frame, layout[2], app_data, app_settings),
         _ => {}
     }
 }
@@ -120,7 +151,7 @@ fn events(app_data: &mut AppData, app_settings: &Settings) -> Result<()> {
                         .intersects(KeyModifiers::SHIFT | KeyModifiers::ALT)
                 {
                     app_data.is_quit = true;
-                }else if key_event.code == KeyCode::Esc{
+                } else if key_event.code == KeyCode::Esc {
                     app_data.is_quit = true;
                 }
             }

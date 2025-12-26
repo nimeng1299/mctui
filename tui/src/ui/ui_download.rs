@@ -144,14 +144,9 @@ fn debug_render(frame: &mut Frame, area: Rect, app_data: &mut AppData) {
 
     if let Some(key_event) = &app_data.key_event
         && key_event.is_press()
-        && app_data
-            .download_data
-            .debug_keys_instant
-            .elapsed()
-            .as_millis()
-            > 200
+        && app_data.keys_instant.elapsed().as_millis() > 200
     {
-        app_data.download_data.debug_keys_instant = Instant::now();
+        app_data.keys_instant = Instant::now();
         match key_event.code {
             KeyCode::Tab => {
                 app_data.download_data.debug_focus = app_data.download_data.debug_focus.tab();
@@ -277,7 +272,12 @@ fn debug_render(frame: &mut Frame, area: Rect, app_data: &mut AppData) {
         && mouse_event.kind
             == crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left)
         && is_contains_rect(mouse_event.column, mouse_event.row, &layout_2[1]).is_some()
-        && app_data.download_data.debug_enter_instant.elapsed().as_millis() > 200
+        && app_data
+            .download_data
+            .debug_enter_instant
+            .elapsed()
+            .as_millis()
+            > 200
     {
         app_data.download_data.debug_focus = DebugFocus::SelectPath;
         enter_facous = DebugFocus::SelectPath;
@@ -301,7 +301,12 @@ fn debug_render(frame: &mut Frame, area: Rect, app_data: &mut AppData) {
         && mouse_event.kind
             == crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left)
         && is_contains_rect(mouse_event.column, mouse_event.row, &layout_2[2]).is_some()
-        && app_data.download_data.debug_enter_instant.elapsed().as_millis() > 200
+        && app_data
+            .download_data
+            .debug_enter_instant
+            .elapsed()
+            .as_millis()
+            > 200
     {
         app_data.download_data.debug_focus = DebugFocus::Download;
         enter_facous = DebugFocus::Download;

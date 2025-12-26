@@ -5,8 +5,6 @@ pub struct GameData {
 
 impl Default for GameData {
     fn default() -> Self {
-        Self {
-            is_starting: 0,
-        }
+        Self { is_starting: 0 }
     }
 }

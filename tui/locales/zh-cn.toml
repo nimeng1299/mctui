@@ -1,6 +1,29 @@
+[ui]
+no_account = "未登录账号"
+
 [ui.menu]
 game = "游戏"
-download = "下载"
+download_install = "下载和安装"
+modpack_manage = "整合包管理"
+account_manage = "账号管理"
+setting = "设置"
+
+[ui.account_manage]
+online_login = "正版登录"
+offline_login = "离线登录"
+other_login = "第三方登录"
+delete_select = "删除账号"
+update_select = "更新账号"
+account_name = "游戏昵称"
+account_type = "账号类型"
+current_account = "当前账户"
+account_manage = "账号管理"
+account_table = "账号管理"
+add_online_account = "添加正版账号"
+add_offline_account = "添加离线账号"
+username_input = "输入用户昵称"
+add = "添加"
+offline = "离线账号"
 
 [ui.download]
 minecraft = "Minecraft"

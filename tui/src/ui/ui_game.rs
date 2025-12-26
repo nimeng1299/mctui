@@ -1,6 +1,10 @@
 use log::{LevelFilter, info};
 use ratatui::{
-    Frame, layout::{Constraint, Layout, Rect}, style::{Color, Style, Stylize}, text::Line, widgets::{Block, LineGauge, Paragraph}
+    Frame,
+    layout::{Constraint, Layout, Rect},
+    style::{Color, Style, Stylize},
+    text::Line,
+    widgets::{Block, LineGauge, Paragraph},
 };
 use tui_logger::{TuiLoggerLevelOutput, TuiLoggerSmartWidget, TuiWidgetState};
 
@@ -53,8 +57,7 @@ pub fn ui_game_render(
         .borders(ratatui::widgets::Borders::ALL);
     frame.render_widget(start_block, layout[0]);
 
-
-    let log_stage=  TuiWidgetState::new().set_default_display_level(LevelFilter::Debug);
+    let log_stage = TuiWidgetState::new().set_default_display_level(LevelFilter::Debug);
     log_stage.transition(tui_logger::TuiWidgetEvent::HideKey);
     let logger = TuiLoggerSmartWidget::default()
         .style_error(Style::default().fg(Color::Red))
@@ -71,17 +74,18 @@ pub fn ui_game_render(
         .state(&log_stage);
     frame.render_widget(logger, layout[1]);
 
-    if progress_len != 0{
+    if progress_len != 0 {
         let process_block = Block::default()
             .title(" Progress ")
             .borders(ratatui::widgets::Borders::ALL);
         let area = process_block.inner(layout[2]);
         frame.render_widget(process_block, layout[2]);
 
+        #[allow(unused_assignments)]
         let mut current_height = 0;
         if !progressing_task.is_empty() {
             for (filename, _progress, downloaded_size, file_len, speed) in progressing_task {
-                let current_area = Rect{
+                let current_area = Rect {
                     y: area.y + current_height,
                     ..area
                 };
@@ -108,11 +112,10 @@ pub fn ui_game_render(
                 current_height += 1;
             }
 
-
-            let current_area = Rect{
-                    y: area.y + current_height,
-                    ..area
-                };
+            let current_area = Rect {
+                y: area.y + current_height,
+                ..area
+            };
             let progress = download_state.total / download_state.all_total;
             let label = format!("{}byte/s {:.1}%", download_state.speed, progress * 100.0,);
             let chunks = Layout::default()
@@ -136,9 +139,9 @@ pub fn ui_game_render(
         }
 
         if app_data.game_data.is_starting > 0 {
-            let current_area = Rect{
-                    y: area.y + current_height,
-                    ..area
+            let current_area = Rect {
+                y: area.y + current_height,
+                ..area
             };
 
             let progress = app_data.game_data.is_starting as f64 / 100.0;
@@ -149,6 +152,5 @@ pub fn ui_game_render(
             frame.render_widget(line_gauge, current_area);
             current_height += 1;
         }
-
     }
 }
