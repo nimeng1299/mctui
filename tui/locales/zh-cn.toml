@@ -1,0 +1,13 @@
+[ui.menu]
+game = "游戏"
+download = "下载"
+
+[ui.download]
+minecraft = "Minecraft"
+modpack = "整合包"
+debug = "debug"
+
+[ui.download.debug_tab]
+url_input = "下载地址"
+path_input = "保存地址"
+download_button = "下载"

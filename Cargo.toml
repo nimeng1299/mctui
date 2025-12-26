@@ -10,3 +10,7 @@ default-members = ["tui"]
 anyhow = "1.0.100"
 directories = "=6.0.0"
 toml = "=0.9.10"
+serde = "1.0.228"
+attohttpc = "=0.30.1"
+log = "=0.4.29"
+chrono = "0.4.42"
