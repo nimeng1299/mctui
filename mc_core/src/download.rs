@@ -43,3 +43,4 @@ fn main() {
 pub mod download_event;
 pub mod download_pool;
 pub mod download_url;
+pub mod single_downloader;

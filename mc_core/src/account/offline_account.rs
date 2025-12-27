@@ -1,6 +1,5 @@
 use crate::account::base::AccountBase;
 
-use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, PartialEq, Serialize, Deserialize)]

@@ -2,11 +2,16 @@
 no_account = "未登录账号"
 
 [ui.menu]
-game = "游戏"
-download_install = "下载和安装"
+game = "游戏(_G)"
+download_install = "下载和安装(_D)"
 modpack_manage = "整合包管理"
 account_manage = "账号管理"
 setting = "设置"
+quit = "退出(_Q)"
+
+[ui.stacked]
+no_account = "暂未登录"
+offline = "离线账号"
 
 [ui.account_manage]
 online_login = "正版登录"
@@ -23,12 +28,12 @@ add_online_account = "添加正版账号"
 add_offline_account = "添加离线账号"
 username_input = "输入用户昵称"
 add = "添加"
-offline = "离线账号"
+
 
 [ui.download]
-minecraft = "Minecraft"
-modpack = "整合包"
-debug = "debug"
+minecraft = "Mine_craft"
+modpack = "整合包(_P)"
+mod = "模组(_M)"
 
 [ui.download.debug_tab]
 url_input = "下载地址"

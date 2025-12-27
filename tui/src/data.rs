@@ -1,74 +1,39 @@
 //! Data struct for the application
-pub mod account_data;
-pub mod download_data;
-pub mod game_data;
+pub mod account;
+pub mod download;
+
+
 
 use std::{
     fs,
     path::{Path, PathBuf},
-    time::Instant,
 };
 
-use anyhow::{Context, Result};
-use crossterm::event::{KeyEvent, MouseEvent};
+use anyhow::{Context, Error, Result};
 use directories::ProjectDirs;
 use log::{info, warn};
-use ratatui::widgets::ListState;
+use rat_salsa::{SalsaAppContext, SalsaContext};
+use rat_theme4::{create_salsa_theme, theme::SalsaTheme};
+use rat_widget::menu::MenuLineState;
 use serde::{Deserialize, Serialize};
 
-use crate::data::{
-    account_data::{AccountData, AccountSetting},
-    download_data::DownloadData,
-};
+use crate::{data::account::AccountSetting, event::AppEvent};
+
 /// This module defines the data structure used to hold the state of the application.
 pub struct AppData {
-    pub message: String,
-    pub is_quit: bool,
-    pub is_read_event: bool,
-
-    pub menu_list_state: ListState, // 菜单栏
-    pub menu_list_keys_instant: Instant,
-
-    pub keys_instant: Instant,
-    pub mouse_instant: Instant,
-    // ui.account
-    pub account_data: AccountData,
-    // ui.game
-    pub game_data: game_data::GameData,
-    // ui.download
-    pub download_data: DownloadData,
-
-    pub event: Option<crossterm::event::Event>,
-    pub key_event: Option<KeyEvent>,
-    pub mouse_event: Option<MouseEvent>,
+    pub menu_selected: MenuLineState,
+    pub download_data: download::DownloadData,
 }
 
-impl AppData {
-    pub fn update_from_setting(&mut self, setting: &Settings) {
-        self.download_data
-            .download_pool
-            .change_max_workers(setting.download_thread);
-    }
-}
+impl AppData {}
 
 impl Default for AppData {
     fn default() -> Self {
-        let mut menu_list_state = ListState::default();
-        menu_list_state.select_first();
+        let mut menu_selected = MenuLineState::default();
+        menu_selected.select(Some(0));
         Self {
-            message: String::new(),
-            is_quit: false,
-            is_read_event: false,
-            menu_list_state,
-            menu_list_keys_instant: Instant::now(),
-            keys_instant: Instant::now(),
-            mouse_instant: Instant::now(),
-            account_data: AccountData::default(),
-            game_data: game_data::GameData::default(),
-            download_data: DownloadData::default(),
-            event: None,
-            key_event: None,
-            mouse_event: None,
+            menu_selected: menu_selected,
+            download_data: download::DownloadData::default(),
         }
     }
 }
@@ -79,8 +44,13 @@ impl Default for AppData {
 pub struct Settings {
     pub mspt: u64,              // milliseconds per tick event
     pub download_thread: usize, // download threads
+    pub theme_name: String,
     // account settings
     pub account_setting: AccountSetting,
+    #[serde(skip)]
+    pub theme: SalsaTheme,
+    #[serde(skip)]
+    pub ctx: SalsaAppContext<AppEvent, Error>,
 }
 
 impl Settings {
@@ -93,6 +63,7 @@ impl Settings {
         if file.is_file() {
             if let Ok(content) = fs::read_to_string(file) {
                 setting = toml::from_str(&content).context("failed to parse settings file")?;
+                setting.theme = create_salsa_theme(&setting.theme_name);
                 info!(target:"MCTui", "Settings loaded.");
             } else {
                 warn!(target:"MCTui", "Failed to read settings file, using default settings.");
@@ -129,12 +100,25 @@ impl Settings {
     }
 }
 
+impl SalsaContext<AppEvent, Error> for Settings {
+    fn set_salsa_ctx(&mut self, app_ctx: rat_salsa::SalsaAppContext<AppEvent, Error>) {
+        self.ctx = app_ctx;
+    }
+
+    fn salsa_ctx(&self) -> &SalsaAppContext<AppEvent, Error> {
+        &self.ctx
+    }
+}
+
 impl Default for Settings {
     fn default() -> Self {
         Self {
             mspt: 10,
             download_thread: 8,
+            theme_name: "Reds Shell".to_string(),
             account_setting: AccountSetting::default(),
+            theme: create_salsa_theme("Reds Shell"),
+            ctx: SalsaAppContext::default(),
         }
     }
 }
